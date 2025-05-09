@@ -1,0 +1,12 @@
+.idea/
+chitu
+client/client
+coordinator/coor
+test/remote/create
+client/client
+*.txt
+*.json
+*.log
+log_*/
+fortest/
+result.txt

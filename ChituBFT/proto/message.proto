@@ -1,0 +1,70 @@
+syntax = "proto3";
+package common;
+
+message Signature {
+    uint32 id = 1;   // signer's id 
+    bytes sig = 2;
+}
+
+message QC {
+    uint32 round = 1;
+    uint32 id = 2;
+    string hash = 3;                // hash of a Vertex
+    string payload = 4;             // hash of Payload
+    uint32 type = 5;                // 0 means echo cert, 1 means ready cert
+    repeated Signature sigs = 6;
+}
+
+message Vertex {
+    uint32 round = 1;
+    uint32 id = 2;
+    string payload = 3;             // hash of a Payload
+    repeated QC Connections = 4;
+    repeated QC WeakConnect = 5;
+}
+
+message Message {
+    enum MsgType {
+        PAYLOAD = 0;
+        VAL = 1;
+        ECHO = 2;
+        READY = 3;
+        DELIVER = 4;
+        SYNC = 5;
+        COIN = 6;
+    }
+    uint32 from = 1;                // who sent the message directly
+    uint32 round = 2;
+    uint32 sender = 3;              // the message owner
+    MsgType type = 4;
+    string hash = 5;                // hash of a Vertex 
+    bytes signature = 6;
+    Vertex vertex = 7;              // useful in VAL message
+    QC     qc = 8;                  // useful in QC message
+    
+    bytes payload = 9;              // Full payload in PAYLOAD message or Coin in COIN message
+    uint32 totalPayloadNum = 10;    // useful in PAYLOAD message
+    uint32 payloadSlice = 11;       // useful in PAYLOAD message
+}
+
+
+
+message ClientReq {
+    int32 startId = 1;
+    uint32 round = 2;
+    int32 reqNum = 3;
+    bytes payload = 4;
+}
+
+message ClientResp {
+
+}
+
+message Batch {
+    repeated  ClientReq reqs = 1;
+}
+
+
+// protoc -I=. -I=$GOPATH/src -I=$GOPATH/src/github.com/gogo/protobuf/protobuf --gogofaster_out=../common message.proto
+// protoc -I=. -I=$GOPATH/src --gogofaster_out=../common message.proto
+
