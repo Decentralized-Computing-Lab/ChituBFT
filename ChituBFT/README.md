@@ -1,4 +1,4 @@
-# Chitu
+# ChituBFT
 This is an implementation of `ChituBFT: Avoiding Unnecessary Fallback in Byzantine Consensus`.
 
 ## Files
@@ -50,6 +50,7 @@ This is an implementation of `ChituBFT: Avoiding Unnecessary Fallback in Byzanti
     We provide a protobuf file compiled in Ubuntu 22.04 x86 platform, see [message.pb.go](./common/message.pb.go)
 
 ## Test
+Run ChituBFT on a cluster of AWS EC2 machines.
 
 ### Build ChituBFT
 You can build node, client and coordinator directly by
@@ -57,7 +58,7 @@ You can build node, client and coordinator directly by
 $ make
 ```
 
-### Run ChituBFT on a cluster of AWS EC2 machines
+### Preparing work
 
 1. **Create a cluster of AWS EC2 machines.**  
     
@@ -103,6 +104,8 @@ $ make
     # Deliver to every node that does not crash.
     $ ./deliverAll.sh [instance num]
     ```
+
+### Run test
 
 5. **Run nodes.**
    ```
@@ -168,9 +171,30 @@ $ make
    $ ./stop.sh [instance num]
    ```
 
+   After stopping, you can start again from step 5 to run a new test.
+
 ## Network ports
 
 * node --> node: 5000+
 * coordinator --> client: 6000+
 * client --> node: 7000+
 * node --> coordinator: 9000
+
+## Note
+
+* **Run ChituBFT without Adaptive Wait.**
+
+    Firstly, you should modify [node.go](./consensus/node.go) by changing
+    ```go
+    1279	// if len(n.DAG[vertex.Round]) == int(n.cfg.N-n.cfg.F) {	// without adaptive wait
+	1280    if (!n.attackSim && len(n.DAG[vertex.Round]) >= int(n.cfg.N-n.cfg.F) && len(n.weakCerts[vertex.Round]) == 0) ||
+	1281	    (n.attackSim && len(n.DAG[vertex.Round]) == int(n.cfg.N)) {		// under attack simulation
+    ```
+    to
+    ```go
+    1279	if len(n.DAG[vertex.Round]) == int(n.cfg.N-n.cfg.F) {	// without adaptive wait
+	1280    // if (!n.attackSim && len(n.DAG[vertex.Round]) >= int(n.cfg.N-n.cfg.F) && len(n.weakCerts[vertex.Round]) == 0) ||
+	1281	//     (n.attackSim && len(n.DAG[vertex.Round]) == int(n.cfg.N)) {		// under attack simulation
+    ```
+
+    Then, you can run the test following Section [Test](#Test).
