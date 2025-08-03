@@ -83,7 +83,7 @@ $ make
     Open a new terminal and fetch instance information by
     ```bash
     $ cd ChituBFT
-    $ mkdir -p config
+    $ mkdir -p conf
     $ cd test
 
     # fetch instance information
